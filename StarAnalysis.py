@@ -66,7 +66,6 @@ class_mapping = {
 
 stardf.Spectral_Class = [class_mapping[item] for item in stardf.Spectral_Class]
 
-# NO NULL VALUES
 # TAKE OUT NON NUMERICAL DATA
 stardf1 = stardf.drop(['Color'], axis=1)
 stardf2 = stardf1.drop(['Spectral_Class'], axis=1)
@@ -113,7 +112,13 @@ plt.show()
 plt.hist(stardf2['A_M'], density=True, bins=15)
 plt.show()
 
-plt.hist(stardf2['Type'], density=True, bins=5)
+plt.hist(stardf2['Type'], density=True, bins=7)
+plt.show()
+
+plt.hist(stardf['Color'], density=True, bins=9)
+plt.show()
+
+plt.hist(stardf['Spectral_Class'], density=True, bins=6)
 plt.show()
 
 # CREATE A BSWARM PLOT FOR EACH COLUMN
@@ -170,9 +175,24 @@ y = stardf['Type']
 X = stardf.drop('Type', axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
+# DETERMINE OPTIMAL K
+n_range = range(1,26)
+scores = {}
+scores_list = []
+for n in n_range:
+    k = KNeighborsClassifier(n_neighbors=n)
+    k.fit(X_train, y_train)
+    predictions = k.predict(X_test)
+    scores[n] = sum(y_test == predictions) / len(y_test)
+    scores_list.append(sum(y_test == predictions) / len(y_test))
+
+print(scores_list)
+plt.plot(n_range, scores_list)
+plt.show()
+
 #CREATE THE KNN MODEL
 k = KNeighborsClassifier(n_neighbors=1)
-k.fit(X, y)
+k.fit(X_train, y_train)
 
 # PREDICT
 model_predictions = k.predict(X_train)
